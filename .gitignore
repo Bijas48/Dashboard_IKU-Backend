@@ -1,6 +1,8 @@
 # Node.js dependencies
 node_modules/
-package-lock.json
+
+# Prisma Generated Client
+generated/
 
 # Logs
 logs/
@@ -10,7 +12,8 @@ yarn-debug.log*
 yarn-error.log*
 
 # Environment variables
-.env
+.env*
+!.env.example
 
 # TypeScript build outputs
 dist/
