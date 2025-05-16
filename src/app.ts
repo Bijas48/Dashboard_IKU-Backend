@@ -1,19 +1,33 @@
-import express from 'express';
-import morgan from 'morgan';
-import helmet from 'helmet';
-import cors from 'cors';
+import express from "express";
+import morgan from "morgan";
+import helmet from "helmet";
+import cors from "cors";
 
-import apiRouter from './api/router';
+import rateLimit from "express-rate-limit";
+import passport from "./config/passport";
 
-require('dotenv').config();
+import apiRouter from "./api/router";
+
+import authRouter from "./api/routes/auth.route";
+
+require("dotenv").config();
 
 const app = express();
 
-app.use(morgan('dev'));
+const corsOptions = {
+  origin: process.env.FRONTEND_URL,
+};
+
+app.use(morgan("dev"));
 app.use(helmet());
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
-app.use('/api/v1', apiRouter);
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
+
+app.use(passport.initialize());
+
+app.use("/api/v1", apiRouter);
+app.use("/api/v1/auth", authRouter); // auth
 
 export default app;
