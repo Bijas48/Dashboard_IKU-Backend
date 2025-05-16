@@ -6,9 +6,22 @@ import { generateToken } from "../../utils/jwt";
 
 const prisma = new PrismaClient();
 
+const isValidEmailDomain = (email: string): boolean => {
+  return email.endsWith("@upi.edu");
+};
+
 export const register = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = registerSchema.parse(req.body);
+
+    if (!isValidEmailDomain(data.email)) {
+      res.status(400).json({
+        error:
+          "Hanya email dengan domain @upi.edu yang diperbolehkan untuk mendaftar",
+      });
+      return;
+    }
+
     const existing = await prisma.user.findUnique({
       where: { email: data.email },
     });
@@ -52,6 +65,14 @@ export const register = async (req: Request, res: Response): Promise<void> => {
 export const login = async (req: Request, res: Response): Promise<void> => {
   try {
     const data = loginSchema.parse(req.body);
+
+    if (!isValidEmailDomain(data.email)) {
+      res.status(400).json({
+        error: "Hanya email dengan domain @upi.edu yang diperbolehkan",
+      });
+      return;
+    }
+
     const user = await prisma.user.findUnique({ where: { email: data.email } });
 
     if (!user || !comparePassword(data.password, user.password)) {
